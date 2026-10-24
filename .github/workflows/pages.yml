@@ -20,8 +20,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
-      - name: Install pandoc
-        run: sudo apt-get update && sudo apt-get install -y pandoc
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install pandoc and nbconvert
+        run: |
+          sudo apt-get update && sudo apt-get install -y pandoc
+          python -m pip install --upgrade pip
+          pip install nbconvert
       - name: Build site
         run: |
           mkdir -p public
@@ -34,9 +40,16 @@ jobs:
             pandoc "$md" -o "public/$name.html" --standalone --from gfm --mathjax \
               --metadata pagetitle="$name" --metadata lang=ja
           done
-          # index.html 内の .md へのリンクを .html に書き換える
+          # IPYNB を HTML にする(実行済みの出力をそのまま使う。再実行はしない)
+          for nb in notebooks/*.ipynb; do
+            jupyter nbconvert --to html "$nb" --output-dir public/
+          done
+          # index.html とレポートの中の .md・.ipynb へのリンクを、Pages 上の .html に書き換える
           sed -i 's/site\/\([A-Za-z0-9_]*\)\.md"/\1.html"/g; s/\([A-Za-z0-9_]*\)\.md"/\1.html"/g' public/index.html
-          sed -i 's/"site\//"/g' public/index.html
+          sed -i 's/"site\//"/g; s/notebooks\/\([A-Za-z0-9_]*\)\.ipynb"/\1.html"/g' public/index.html
+          for f in public/*.html; do
+            sed -i 's/\.\.\/notebooks\/\([A-Za-z0-9_]*\)\.ipynb"/\1.html"/g' "$f"
+          done
           ls -R public
       - uses: actions/upload-pages-artifact@v3
         with:

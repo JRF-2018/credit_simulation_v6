@@ -2,8 +2,8 @@
 
 v6 は、v5 を読み解いたうえで組み直した「信用循環モデル」である。モデルの導き方と議論は、二つの IPYNB にある。
 
-- [信用創造はどこで止まるのか ――「信用創造ダイナミクス v5」を読み解き、利子が経済に戻るモデルへ組み直す](https://github.com/JRF-2018/misc_ipynb/blob/master/credit_creation_v5.ipynb)
-- [信用の世界経済は一つか ―― 国のモデルを連結し、縮約し、射影する](https://github.com/JRF-2018/misc_ipynb/blob/master/credit_linkage.ipynb)
+- [信用創造はどこで止まるのか ――「信用創造ダイナミクス v5」を読み解き、利子が経済に戻るモデルへ組み直す](../notebooks/credit_creation_v6.ipynb)
+- [信用の世界経済は一つか ―― 国のモデルを連結し、縮約し、射影する](../notebooks/credit_linkage.ipynb)
 
 シミュレーションのページは、[一地域版](credit_simulation_v6.html)と[世界版(二地域)](credit_simulation_v6_world.html)である。
 このレポートの表は、すべて `tools/make_report_tables.py` で Python の参照実装(IPYNB と同じもの)から計算した。

@@ -12,10 +12,14 @@
 * [credit_simulation_v6_world.html](https://jrf-2018.github.io/credit_simulation_v6/credit_simulation_v6_world.html) … 世界版(二つの地域を貿易と金融でつなぐ)。
 * [simulation_v6_analysis](https://jrf-2018.github.io/credit_simulation_v6/simulation_v6_analysis.html) … 分析レポート([Markdown](site/simulation_v6_analysis.md))。
 
-モデルの導き方と議論は、二つの IPYNB にあります。
+モデルの導き方と議論は、二つの IPYNB(`notebooks/`)にあります。HTML にしたものも Pages に置いています。
 
-* [信用創造はどこで止まるのか ――「信用創造ダイナミクス v5」を読み解き、利子が経済に戻るモデルへ組み直す](https://github.com/JRF-2018/misc_ipynb/blob/master/credit_creation_v5.ipynb)
-* [信用の世界経済は一つか ―― 国のモデルを連結し、縮約し、射影する](https://github.com/JRF-2018/misc_ipynb/blob/master/credit_linkage.ipynb)
+* [信用創造はどこで止まるのか ――「信用創造ダイナミクス v5」を読み解き、利子が経済に戻るモデルへ組み直す](notebooks/credit_creation_v6.ipynb)
+  * HTML: https://jrf-2018.github.io/credit_simulation_v6/credit_creation_v6.html
+* [信用の世界経済は一つか ―― 国のモデルを連結し、縮約し、射影する](notebooks/credit_linkage.ipynb)
+  * HTML: https://jrf-2018.github.io/credit_simulation_v6/credit_linkage.html
+
+どちらも、上から順に実行すれば全部動きます(numpy, scipy, matplotlib。Google Colab でも動きます)。Lean のセルは最後にまとめてチェックします(Lean がない環境では elan と Mathlib を入れるので時間がかかります)。
 
 ## v6 のモデル(v5 との違い)
 
@@ -42,6 +46,7 @@
 
 ## 中身
 
+* `notebooks/` … 二つの IPYNB(実行済みの出力つき)。Pages の配備のときに HTML に変換します。
 * `site/` … シミュレーションのページ(`model_v6.js` と `world_v6.js` がモデル本体)と分析レポート。GitHub Actions(`.github/workflows/pages.yml`)で GitHub Pages に配備します。
 * `python/` … 参照実装(IPYNB と同じもの)。`sims.py`(v5 の移植と一地域版)、`world.py`(世界版)。
   * `check_js_vs_py.py` … ページの JavaScript と参照実装の数値の一致を確かめる(CI の `.github/workflows/check.yml`)。JavaScript は quickjs で動かします。
@@ -61,7 +66,7 @@ lake build
 * 解説記事(v1〜v3): 《[信用創造の限界は法定準備率か金利か](http://jrf.cocolog-nifty.com/statuses/2026/02/post-a648df.html)》(2026年2月)、(v4・v5)《[資本主義の成立(労働力の空売り)と魔術](http://jrf.cocolog-nifty.com/statuses/2026/04/post-84784d.html)》(2026年4月)
 * 中核と周辺: https://github.com/JRF-2018/wallerstein_theory
 
-## Author
+## Author (文責)
 
 JRF ( http://jrf.cocolog-nifty.com/statuses , Twitter (X): @jion_rockford )
 
