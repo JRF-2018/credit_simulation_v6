@@ -1,0 +1,16 @@
+name: Lean
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: leanprover/lean-action@v1
+      - name: No sorry
+        run: |
+          if grep -rn "sorry" CreditV6/ CreditV6.lean; then echo "sorry found"; exit 1; fi

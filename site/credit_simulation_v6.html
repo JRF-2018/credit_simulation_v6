@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>信用創造ダイナミクス v6</title>
+<style>
+  :root {
+    --bg:#0f1117;--bg2:#181c27;--border:#2a3050;--accent:#4a9eff;--accent2:#f0a500;
+    --accent3:#e05555;--accent4:#50c878;--new:#a78bfa;
+    --text:#cdd5f0;--text2:#8890b0;--text3:#5a6080;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--bg);color:var(--text);font-family:'Courier New',monospace;font-size:13px;line-height:1.6;padding:20px;max-width:1200px;margin:0 auto;}
+  a{color:var(--accent);}
+  h1{font-size:18px;color:var(--accent);border-bottom:1px solid var(--border);padding-bottom:8px;margin-bottom:6px;}
+  .sub{color:var(--text2);font-size:11px;margin-bottom:4px;}
+  .vnote{color:var(--new);font-size:11px;margin-bottom:6px;}
+  .grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin:16px 0;}
+  @media(max-width:900px){.grid{grid-template-columns:1fr;}}
+  .panel{background:var(--bg2);border:1px solid var(--border);border-radius:4px;padding:14px;}
+  .panel h2{font-size:12px;color:var(--accent2);margin-bottom:12px;letter-spacing:.1em;}
+  .pr{display:flex;align-items:center;margin-bottom:8px;gap:8px;}
+  .pr label{flex:1;color:var(--text2);font-size:11px;}
+  .pr input[type=range]{width:110px;accent-color:var(--accent);}
+  .pr .val{width:52px;text-align:right;color:var(--accent);font-size:12px;}
+  .pr select,.pr input[type=number]{background:var(--bg);color:var(--text);border:1px solid var(--border);font-family:inherit;font-size:11px;padding:2px;}
+  .pr input[type=number]{width:70px;}
+  .pd{color:var(--text3);font-size:10px;margin-top:-5px;margin-bottom:7px;padding-left:4px;}
+  .btn{background:var(--accent);color:#000;border:none;padding:8px 24px;font-family:inherit;font-size:13px;font-weight:bold;cursor:pointer;border-radius:2px;display:block;margin:6px auto 0;letter-spacing:.1em;}
+  .btn:hover{background:#6ab4ff;}
+  .sg{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-bottom:16px;}
+  @media(max-width:900px){.sg{grid-template-columns:repeat(3,1fr);}}
+  .sb{background:var(--bg2);border:1px solid var(--border);border-radius:4px;padding:8px 10px;text-align:center;}
+  .sb .lbl{color:var(--text3);font-size:10px;}
+  .sb .val{color:var(--accent);font-size:14px;font-weight:bold;}
+  .sb .val.warn{color:var(--accent3);} .sb .val.ok{color:var(--accent4);}
+  .verdict{text-align:center;font-size:13px;font-weight:bold;padding:8px;border-radius:3px;margin-bottom:16px;}
+  .stable{background:#1a3a1a;color:var(--accent4);border:1px solid var(--accent4);}
+  .vwarn{background:#3a2a1a;color:var(--accent2);border:1px solid var(--accent2);}
+  .crisis{background:#3a1a1a;color:var(--accent3);border:1px solid var(--accent3);}
+  .charts{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+  @media(max-width:900px){.charts{grid-template-columns:1fr;}}
+  .chartbox{background:var(--bg2);border:1px solid var(--border);border-radius:4px;padding:8px;}
+  .chartbox h3{font-size:11px;color:var(--text2);font-weight:normal;margin-bottom:4px;}
+  canvas{width:100%;height:180px;display:block;}
+  .leg{display:flex;flex-wrap:wrap;gap:12px;font-size:10px;margin-top:4px;color:var(--text2);}
+  .ld{display:flex;align-items:center;gap:4px;}
+  .dot{width:18px;height:3px;border-radius:1px;display:inline-block;}
+  .ep{background:var(--bg2);border:1px solid var(--border);border-radius:4px;padding:14px;margin-top:16px;}
+  .ep h2{font-size:12px;color:var(--accent2);margin-bottom:10px;letter-spacing:.1em;}
+  .eq{color:var(--text2);font-size:11px;line-height:1.9;}
+  .eq .nw{color:var(--new);} .eq .cm{color:var(--text3);}
+  .ann{color:var(--text3);font-size:11px;margin-top:8px;line-height:1.8;}
+  .tabs{margin:8px 0 0;font-size:12px;}
+</style>
+</head>
+<body>
+
+<h1>信用創造ダイナミクス v6 ― 信用循環モデル(一地域版)</h1>
+<div class="sub">STOCK-FLOW CONSISTENT | TWO CLASSES (WORKERS / RENTIERS) | INTEREST RETURNS AS INCOME | RATE OR QUANTITY REGIME</div>
+<div class="vnote">v5 からの変更: ★ 利子と配当は金利生活者の所得として経済に戻る(v5 では利払いが経済から消え、長期には必ず崩壊していた)。★ 所得は需要(労働者の消費 + 金利生活者の消費 + 投資 + 政府支出)で決まる。★ 株式的富 E は期待利潤の資本還元。★ 銀行の「金利の制度」と「量の制度」を切り替えられる。★ Φ・θ・実効準備率 ρ+cu・経済全体の貯蓄率は、仮定ではなく結果として出てくる。</div>
+<div class="vnote">世界版(二地域): <a href="credit_simulation_v6_world.html">credit_simulation_v6_world.html</a> | 分析レポート: <a href="simulation_v6_analysis.html">simulation_v6_analysis</a> | 解説 IPYNB: <a href="https://github.com/JRF-2018/misc_ipynb/blob/master/credit_creation_v5.ipynb">信用創造はどこで止まるのか</a>、<a href="https://github.com/JRF-2018/misc_ipynb/blob/master/credit_linkage.ipynb">信用の世界経済は一つか</a> | <a href="https://github.com/JRF-2018/credit_simulation_v6">リポジトリ</a></div>
+
+<div class="grid">
+  <div class="panel">
+    <h2>金融・制度</h2>
+    <div class="pr"><label>政策金利 r_cb</label><input type="range" id="r_cb" min="0" max="0.12" step="0.005" value="0.03"><span class="val" id="r_cb_v"></span></div>
+    <div class="pd">国債金利でもある。利子は金利生活者の所得になる。</div>
+    <div class="pr"><label>法定準備率 ρ</label><input type="range" id="rho" min="0" max="0.4" step="0.01" value="0.05"><span class="val" id="rho_v"></span></div>
+    <div class="pd">金利の制度では貸出金利への税 (r+spread)/(1−ρ)。量の制度では信用の上限 (1−ρ)H/(ρ+cu)。</div>
+    <div class="pr"><label>銀行の制度</label><select id="regime"><option value="rate">金利の制度</option><option value="quantity">量の制度</option></select></div>
+    <div class="pr"><label>ベースマネーの伸び gH</label><input type="range" id="gH" min="0" max="0.08" step="0.005" value="0.05"><span class="val" id="gH_v"></span></div>
+    <div class="pd">量の制度のときだけ効く。</div>
+    <div class="pr"><label>タンス預金 cu0</label><input type="range" id="cu0" min="0" max="0.4" step="0.01" value="0.05"><span class="val" id="cu0_v"></span></div>
+    <div class="pd">現金/預金比。実効準備率 = ρ + cu。</div>
+    <div class="pr"><label>リスクプレミアム prem</label><input type="range" id="prem" min="0.002" max="0.05" step="0.002" value="0.02"><span class="val" id="prem_v"></span></div>
+    <div class="pd">E = 期待利潤 / (r_L + prem)。下がると「株式的富というペテンへの信頼」が高まる。</div>
+    <div class="pr"><label>担保掛け目 λ</label><input type="range" id="lam" min="0.2" max="1.0" step="0.05" value="0.6"><span class="val" id="lam_v"></span></div>
+    <div class="pd">借入の上限 L ≤ λ(E + K)。</div>
+  </div>
+
+  <div class="panel">
+    <h2>分配・需要・投資</h2>
+    <div class="pr"><label>賃金分配率 ω</label><input type="range" id="omega" min="0.4" max="0.85" step="0.01" value="0.65"><span class="val" id="omega_v"></span></div>
+    <div class="pr"><label>金利生活者の消費性向 c_r</label><input type="range" id="c_r" min="0.05" max="0.9" step="0.05" value="0.35"><span class="val" id="c_r_v"></span></div>
+    <div class="pd">低いほど利払いが需要から漏れる(v5 の s_eff の正体)。</div>
+    <div class="pr"><label>労働者の消費性向 c_w</label><input type="range" id="c_w" min="0.7" max="1.0" step="0.01" value="0.95"><span class="val" id="c_w_v"></span></div>
+    <div class="pr"><label>投資の利潤への反応 g1</label><input type="range" id="g1" min="0.3" max="1.2" step="0.05" value="0.75"><span class="val" id="g1_v"></span></div>
+    <div class="pr"><label>投資の q への反応 g_q</label><input type="range" id="g_q" min="0" max="0.05" step="0.005" value="0"><span class="val" id="g_q_v"></span></div>
+    <div class="pd">株式的富が投資を動かす強さ(トービンの q)。</div>
+    <div class="pr"><label>在庫維持能力の喪失 κ</label><input type="range" id="kappa" min="0" max="8" step="0.5" value="3"><span class="val" id="kappa_v"></span></div>
+    <div class="pd">E が縮むときに損耗が増える倍率(v5 から継承)。</div>
+    <div class="pr"><label>配当性向 payout</label><input type="range" id="payout" min="0.2" max="0.9" step="0.05" value="0.6"><span class="val" id="payout_v"></span></div>
+  </div>
+
+  <div class="panel">
+    <h2>国家・労働・ショック</h2>
+    <div class="pr"><label>政府支出 gG</label><input type="range" id="gG" min="0.1" max="0.3" step="0.01" value="0.2"><span class="val" id="gG_v"></span></div>
+    <div class="pr"><label>税率 τ</label><input type="range" id="tau" min="0.1" max="0.4" step="0.01" value="0.25"><span class="val" id="tau_v"></span></div>
+    <div class="pr"><label>財政ルール fiscal</label><input type="range" id="fiscal" min="0" max="0.1" step="0.01" value="0"><span class="val" id="fiscal_v"></span></div>
+    <div class="pd">国債比率が 0.6 を超えた分に応じて税率を上げる強さ。</div>
+    <div class="pr"><label>労働の天井</label><select id="labor_cap"><option value="0">なし(読み出しのみ)</option><option value="1">あり</option></select></div>
+    <div class="pr"><label>グッドウィン(賃金の反応)</label><input type="range" id="phillips" min="0" max="0.5" step="0.05" value="0"><span class="val" id="phillips_v"></span></div>
+    <hr style="border:none;border-top:1px solid var(--border);margin:8px 0;">
+    <div class="pr"><label>プリセット</label><select id="preset"></select></div>
+    <div class="pr"><label>ショック</label><select id="sh_param"></select><input type="number" id="sh_value" step="0.005"></div>
+    <div class="pr"><label>時刻(年)/期間(年)</label><input type="number" id="sh_t" value="20" step="1"><input type="number" id="sh_dur" value="1" step="0.5"></div>
+    <div class="pd">指定した年から、指定した期間をかけて、そのパラメータを値へ動かす。</div>
+    <div class="pr"><label>期間 T(年)</label><input type="range" id="T" min="40" max="300" step="10" value="100"><span class="val" id="T_v"></span></div>
+    <button class="btn" onclick="runSim()">▶ 実行</button>
+  </div>
+</div>
+
+<div class="sg" id="stats"></div>
+<div class="verdict" id="verdict">—</div>
+
+<div class="charts">
+  <div class="chartbox"><h3>ショックなしの基準経路との比(所得 Y・資本 K・株式的富 E)</h3><canvas id="c_rel"></canvas><div class="leg" id="l_rel"></div></div>
+  <div class="chartbox"><h3>利払い負担 Φ と、利払い前の純利潤分配率 θ*</h3><canvas id="c_phi"></canvas><div class="leg" id="l_phi"></div></div>
+  <div class="chartbox"><h3>債務 / 所得(企業の借入 L/Y・国債 B/Y)</h3><canvas id="c_debt"></canvas><div class="leg" id="l_debt"></div></div>
+  <div class="chartbox"><h3>成長率 g・貸出金利 r_L・損耗率 δ</h3><canvas id="c_rate"></canvas><div class="leg" id="l_rate"></div></div>
+  <div class="chartbox"><h3>稼働率 u・トービンの q・雇用率</h3><canvas id="c_util"></canvas><div class="leg" id="l_util"></div></div>
+  <div class="chartbox"><h3>ミンスキーの分類(緑 = ヘッジ、黄 = 投機的、赤 = ポンジ)と実効準備率 ρ+cu</h3><canvas id="c_min"></canvas><div class="leg" id="l_min"></div></div>
+</div>
+
+<div class="ep">
+  <h2>モデル方程式 v6(1 期 = 0.1 年)</h2>
+  <div class="eq">
+<span class="cm">// 貸出金利: 無利子の準備の分の割り増し + 貸倒れリスク</span><br>
+r_L = (r_cb + spread)/(1 − ρ) + spread_loss · min(貸倒れ率, 0.1)<br>
+<span class="cm">// 株式的富: 期待利潤 Π^e の資本還元(v5 の E = K^α/(r+δ) に代わる)</span><br>
+<span class="nw">E = Π^e / (r_L + prem)</span>　　Π^e は利潤 Π を 2 年の時定数で追う<br>
+<span class="cm">// 投資の希望(前の期の利潤率とトービンの q に反応)</span><br>
+I^des/K = δ0 + g0 + g1·Π/K + g2·(u − 0.85) + g_q·(E/K − q_ref)<br>
+<span class="cm">// 借入: 内部資金で足りない分。担保の上限を超えると返済(量の制度ではさらに信用の上限)</span><br>
+ΔL = softmin(I^des − 内部資金, (λ(E+K) − L)/T_adj [, ((1−ρ)H/(ρ+cu) − L − B)/T_adj])<br>
+<span class="cm">// 所得: 需要が決める(利子・配当は金利生活者の所得として戻る)</span><br>
+<span class="nw">Y = c_w(1−τ)ωY + c_r(1−τ)(r_L L + r_cb B + 配当) + c_v(L+B) + I + G</span>　(生産能力 u_max·K/v を超えた分は強制貯蓄)<br>
+Π = (1−ω)Y − δ0 K − r_L L　　配当 = payout·Π<br>
+<span class="cm">// 結果として出てくる量(v5 では仮定だったもの)</span><br>
+<span class="nw">Φ = r_L L / Y</span>(利払い負担率)　<span class="nw">θ* = ((1−ω)Y − δ0 K)/Y</span>(利払い前の純利潤分配率)　<span class="nw">ρ_eff = ρ + cu</span><br>
+<span class="cm">// ストック</span><br>
+K ← K + (I − δK)dt,　δ = δ0(1 + κ·stress_E)　　L ← L + (ΔL − 貸倒れ)dt　　B ← B + (G + r_cb B − 税)dt
+  </div>
+  <div class="ann">
+    初期値は、ショックなしで 300 年走らせた釣り合いの取れた経路の比率に置いている。ショックの値を入れて「▶ 実行」すると、同じパラメータでショックだけを外した基準経路と比べて表示する。<br>
+    Python の参照実装(IPYNB と同じもの)と、このページの JavaScript は、CI で数値の一致を確かめている。
+  </div>
+</div>
+
+<script src="model_v6.js"></script>
+<script>
+'use strict';
+const C = window.CreditV6;
+const SLIDERS = ['r_cb','rho','gH','cu0','prem','lam','omega','c_r','c_w','g1','g_q','kappa','payout','gG','tau','fiscal','phillips','T'];
+const SHOCK_PARAMS = ['(なし)','r_cb','rho','cu0','prem','c_r','c_w','omega','g0','gG','tau','fiscal','g_q','kappa'];
+const PRESETS = {
+  '基準': {},
+  '金利を 3% → 6%(20 年目)': {shock:['r_cb',0.06,20,1]},
+  '準備率を 5% → 20%(金利の制度)': {shock:['rho',0.2,20,1]},
+  'タンス預金の急増(量の制度)': {set:{regime:'quantity',gH:0.05}, shock:['cu0',0.3,20,1]},
+  '準備率を 5% → 20%(量の制度)': {set:{regime:'quantity',gH:0.05}, shock:['rho',0.2,20,1]},
+  '金利生活者が使わなくなる': {shock:['c_r',0.15,20,1]},
+  '賃金分配率を 0.65 → 0.70': {shock:['omega',0.70,20,1]},
+  'ブーム(prem 低下)の後に金利引上げ': {set:{g_q:0.03,T:80}, shocks:[[10,{prem:0.008},10],[25,{r_cb:0.06},1]]},
+  '労働の天井 + グッドウィン': {set:{labor_cap:'1',phillips:0.15,T:150}},
+  '財政ルール + 金利 9%': {shocks:[[20,{r_cb:0.09,fiscal:0.05},1]]},
+};
+let extraShocks = null;   // プリセットの複数ショック
+
+function fmtv(id, v){ return (id==='T') ? v.toFixed(0) : (Math.abs(v) < 0.1 && v !== 0 ? v.toFixed(3) : v.toFixed(2)); }
+SLIDERS.forEach(id => {
+  const el = document.getElementById(id), vEl = document.getElementById(id + '_v');
+  const upd = () => { vEl.textContent = fmtv(id, parseFloat(el.value)); };
+  el.addEventListener('input', () => { upd(); extraShocks = null; }); upd();
+});
+const sel = document.getElementById('sh_param');
+SHOCK_PARAMS.forEach(k => { const o = document.createElement('option'); o.value = k; o.textContent = k; sel.appendChild(o); });
+const psel = document.getElementById('preset');
+Object.keys(PRESETS).forEach(k => { const o = document.createElement('option'); o.value = k; o.textContent = k; psel.appendChild(o); });
+const DEFAULTS = {};
+SLIDERS.concat(['regime','labor_cap']).forEach(id => DEFAULTS[id] = document.getElementById(id).value);
+psel.addEventListener('change', () => {
+  const pr = PRESETS[psel.value];
+  for (const id in DEFAULTS) document.getElementById(id).value = DEFAULTS[id];
+  if (pr.set) for (const k in pr.set) document.getElementById(k).value = pr.set[k];
+  sel.value = '(なし)'; document.getElementById('sh_value').value = ''; extraShocks = null;
+  document.getElementById('sh_t').value = 20; document.getElementById('sh_dur').value = 1;
+  if (pr.shock) { sel.value = pr.shock[0]; document.getElementById('sh_value').value = pr.shock[1];
+    document.getElementById('sh_t').value = pr.shock[2]; document.getElementById('sh_dur').value = pr.shock[3]; }
+  if (pr.shocks) extraShocks = pr.shocks;
+  SLIDERS.forEach(id => document.getElementById(id).dispatchEvent(new Event('input')));
+  if (pr.shocks) extraShocks = pr.shocks;
+  runSim();
+});
+
+function getParams(){
+  const p = {};
+  SLIDERS.forEach(id => p[id] = parseFloat(document.getElementById(id).value));
+  p.regime = document.getElementById('regime').value;
+  p.labor_cap = document.getElementById('labor_cap').value === '1';
+  return p;
+}
+function getShocks(){
+  if (extraShocks) return extraShocks;
+  const k = sel.value, v = parseFloat(document.getElementById('sh_value').value);
+  if (k === '(なし)' || !isFinite(v)) return [];
+  return [[parseFloat(document.getElementById('sh_t').value), {[k]: v}, parseFloat(document.getElementById('sh_dur').value)]];
+}
+
+// --- 作図(一つの図に一つの縦軸。線は 2px) ---
+function drawChart(id, legId, series, opt){
+  opt = opt || {};
+  const cv = document.getElementById(id), dpr = window.devicePixelRatio || 1;
+  cv.width = cv.offsetWidth * dpr; cv.height = cv.offsetHeight * dpr;
+  const ctx = cv.getContext('2d'); ctx.scale(dpr, dpr);
+  const W = cv.offsetWidth, H = cv.offsetHeight, pad = {l:46, r:10, t:8, b:22};
+  const pw = W - pad.l - pad.r, ph = H - pad.t - pad.b;
+  ctx.fillStyle = '#181c27'; ctx.fillRect(0, 0, W, H);
+  let lo = Infinity, hi = -Infinity;
+  series.forEach(s => s.data.forEach(v => { if (isFinite(v)) { lo = Math.min(lo, v); hi = Math.max(hi, v); } }));
+  if (opt.min !== undefined) lo = Math.min(lo, opt.min);
+  if (opt.max !== undefined) hi = Math.max(hi, opt.max);
+  if (!(hi > lo)) { hi = lo + 1; }
+  const m = (hi - lo) * 0.08; lo -= m; hi += m;
+  const n = series[0].data.length, T = opt.T;
+  const X = i => pad.l + pw * i / (n - 1), Yy = v => pad.t + ph * (1 - (v - lo) / (hi - lo));
+  ctx.strokeStyle = '#2a3050'; ctx.lineWidth = 0.5; ctx.fillStyle = '#5a6080'; ctx.font = '9px Courier New'; ctx.textAlign = 'right';
+  for (let k = 0; k <= 4; k++) { const v = lo + (hi - lo) * k / 4, y = Yy(v);
+    ctx.beginPath(); ctx.moveTo(pad.l, y); ctx.lineTo(pad.l + pw, y); ctx.stroke(); ctx.fillText(v.toFixed(Math.abs(hi - lo) < 0.5 ? 3 : 2), pad.l - 3, y + 3); }
+  ctx.textAlign = 'center';
+  for (let k = 0; k <= 4; k++) { const i = Math.round((n - 1) * k / 4); ctx.fillText((T * k / 4).toFixed(0), X(i), H - 6); }
+  if (opt.band) { opt.band.forEach((c, i) => { if (i > 0) { ctx.fillStyle = c; ctx.fillRect(X(i - 1), pad.t, X(i) - X(i - 1) + 0.5, 8); } }); }
+  if (opt.ref !== undefined) { ctx.strokeStyle = '#5a6080'; ctx.setLineDash([3, 3]); ctx.beginPath(); ctx.moveTo(pad.l, Yy(opt.ref)); ctx.lineTo(pad.l + pw, Yy(opt.ref)); ctx.stroke(); ctx.setLineDash([]); }
+  series.forEach(s => { ctx.beginPath(); ctx.strokeStyle = s.color; ctx.lineWidth = 2;
+    s.data.forEach((v, i) => { const y = Yy(Math.min(Math.max(v, lo), hi)); i ? ctx.lineTo(X(i), y) : ctx.moveTo(X(i), y); }); ctx.stroke(); });
+  document.getElementById(legId).innerHTML = series.map(s => `<div class="ld"><div class="dot" style="background:${s.color}"></div>${s.label}</div>`).join('');
+}
+const COL = ['#4a9eff', '#f0a500', '#50c878', '#e05555', '#a78bfa'];
+
+function stat(label, v, cls){ return `<div class="sb"><div class="lbl">${label}</div><div class="val ${cls||''}">${v}</div></div>`; }
+
+function runSim(){
+  const p = getParams(), shocks = getShocks();
+  const base = C.simulateCM(Object.assign({}, p, {shocks: []}));
+  const h = C.simulateCM(Object.assign({}, p, {shocks}));
+  const n = h.Y.length, last = n - 1, T = p.T;
+  const rel = k => Array.from(h[k], (v, i) => v / base[k][i]);
+  const relY = rel('Y'), minRel = Math.min(...relY);
+  drawChart('c_rel', 'l_rel', [{label:'Y / 基準', data:relY, color:COL[0]}, {label:'K / 基準', data:rel('K'), color:COL[1]}, {label:'E / 基準', data:rel('E'), color:COL[2]}], {T, ref:1});
+  drawChart('c_phi', 'l_phi', [{label:'Φ = r_L L / Y', data:h.Phi, color:COL[0]}, {label:'θ*', data:h.theta_star, color:COL[1]}], {T, min:0});
+  drawChart('c_debt', 'l_debt', [{label:'L / Y', data:h.L_Y, color:COL[0]}, {label:'B / Y', data:h.B_Y, color:COL[1]}], {T, min:0});
+  drawChart('c_rate', 'l_rate', [{label:'g', data:h.g, color:COL[0]}, {label:'r_L', data:h.r_L, color:COL[1]}, {label:'δ', data:h.delta, color:COL[2]}], {T});
+  drawChart('c_util', 'l_util', [{label:'u', data:h.u, color:COL[0]}, {label:'q = E/K', data:h.q, color:COL[1]}, {label:'雇用率', data:h.emp, color:COL[2]}], {T, ref:1});
+  const band = Array.from(h.minsky, v => v === 2 ? '#50c878' : (v === 1 ? '#f0a500' : '#e05555'));
+  drawChart('c_min', 'l_min', [{label:'ρ + cu', data:h.rho_eff, color:COL[4]}], {T, min:0, band});
+  const g = h.g[last], ponzi = h.minsky.some(v => v === 0), lossMax = Math.max(...h.loss_rate);
+  const byGrowth = h.B_Y[last] > 2 * h.B_Y[Math.floor(n / 2)] && h.B_Y[last] > 4;
+  const st = [
+    stat('成長率 g', (100 * g).toFixed(2) + '%', g < 0.01 ? 'warn' : 'ok'),
+    stat('Y / 基準(最終)', relY[last].toFixed(3), relY[last] < 0.9 ? 'warn' : ''),
+    stat('Y / 基準(最低)', minRel.toFixed(3), minRel < 0.8 ? 'warn' : ''),
+    stat('稼働率 u', h.u[last].toFixed(3)),
+    stat('Φ(利払い負担)', h.Phi[last].toFixed(4), h.Phi[last] > h.theta_star[last] ? 'warn' : ''),
+    stat('θ*(純利潤分配率)', h.theta_star[last].toFixed(3)),
+    stat('L / Y', h.L_Y[last].toFixed(3)),
+    stat('B / Y', h.B_Y[last].toFixed(2), byGrowth ? 'warn' : ''),
+    stat('トービンの q', h.q[last].toFixed(3)),
+    stat('貸出金利 r_L', (100 * h.r_L[last]).toFixed(2) + '%'),
+    stat('経済全体の貯蓄率', h.s_agg[last].toFixed(3)),
+    stat('雇用率', h.emp[last].toFixed(3), h.emp[last] > 1 ? 'warn' : ''),
+  ];
+  document.getElementById('stats').innerHTML = st.join('');
+  const vEl = document.getElementById('verdict');
+  let cls = 'stable', msg = '✅ 釣り合いの取れた成長';
+  if (ponzi || lossMax > 0.02) { cls = 'crisis'; msg = '❌ 危機: 利払いができない企業(ポンジ)・貸倒れが出ている'; }
+  else if (minRel < 0.6) { cls = 'crisis'; msg = '❌ 崩落: 所得が基準の 6 割を下回った(量の制度の信用収縮・担保の崩壊など)'; }
+  else if (minRel < 0.85) { cls = 'vwarn'; msg = '⚠️ 深い落ち込み: 所得が基準の 85% を下回った'; }
+  else if (byGrowth) { cls = 'vwarn'; msg = '⚠️ 国債比率が発散傾向(利子率が成長率を上回る)'; }
+  else if (relY[last] < 0.9) { cls = 'vwarn'; msg = '⚠️ 長期停滞: 所得が基準より低いまま、差が広がっている'; }
+  else if (h.emp[last] > 1.0) { cls = 'vwarn'; msg = '⚠️ 雇用率が 100% を超えている(労働の天井を入れないと、労働の読み出しは矛盾する)'; }
+  else if (g < 0.01) { cls = 'vwarn'; msg = '⚠️ 低成長'; }
+  vEl.className = 'verdict ' + cls; vEl.textContent = msg;
+}
+runSim();
+</script>
+</body>
+</html>

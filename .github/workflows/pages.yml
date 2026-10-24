@@ -1,0 +1,53 @@
+name: Deploy site to GitHub Pages
+
+on:
+  push:
+    branches:
+      - master
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - name: Install pandoc
+        run: sudo apt-get update && sudo apt-get install -y pandoc
+      - name: Build site
+        run: |
+          mkdir -p public
+          cp -r site/* public/
+          # README と Markdown のレポートを HTML にする(数式は MathJax で表示)
+          pandoc README.md -o public/index.html --standalone --from gfm --mathjax \
+            --metadata pagetitle="credit_simulation_v6" --metadata lang=ja
+          for md in site/*.md; do
+            name=$(basename "$md" .md)
+            pandoc "$md" -o "public/$name.html" --standalone --from gfm --mathjax \
+              --metadata pagetitle="$name" --metadata lang=ja
+          done
+          # index.html 内の .md へのリンクを .html に書き換える
+          sed -i 's/site\/\([A-Za-z0-9_]*\)\.md"/\1.html"/g; s/\([A-Za-z0-9_]*\)\.md"/\1.html"/g' public/index.html
+          sed -i 's/"site\//"/g' public/index.html
+          ls -R public
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./public
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

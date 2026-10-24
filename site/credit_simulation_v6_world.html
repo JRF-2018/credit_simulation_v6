@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>信用創造ダイナミクス v6 世界版</title>
+<style>
+  :root {
+    --bg:#0f1117;--bg2:#181c27;--border:#2a3050;--accent:#4a9eff;--accent2:#f0a500;
+    --accent3:#e05555;--accent4:#50c878;--new:#a78bfa;
+    --text:#cdd5f0;--text2:#8890b0;--text3:#5a6080;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--bg);color:var(--text);font-family:'Courier New',monospace;font-size:13px;line-height:1.6;padding:20px;max-width:1200px;margin:0 auto;}
+  a{color:var(--accent);}
+  h1{font-size:18px;color:var(--accent);border-bottom:1px solid var(--border);padding-bottom:8px;margin-bottom:6px;}
+  .sub{color:var(--text2);font-size:11px;margin-bottom:4px;}
+  .vnote{color:var(--new);font-size:11px;margin-bottom:6px;}
+  .grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin:16px 0;}
+  @media(max-width:900px){.grid{grid-template-columns:1fr;}}
+  .panel{background:var(--bg2);border:1px solid var(--border);border-radius:4px;padding:14px;}
+  .panel h2{font-size:12px;color:var(--accent2);margin-bottom:12px;letter-spacing:.1em;}
+  .pr{display:flex;align-items:center;margin-bottom:8px;gap:8px;}
+  .pr label{flex:1;color:var(--text2);font-size:11px;}
+  .pr input[type=range]{width:100px;accent-color:var(--accent);}
+  .pr .val{width:52px;text-align:right;color:var(--accent);font-size:12px;}
+  .pr select,.pr input[type=number]{background:var(--bg);color:var(--text);border:1px solid var(--border);font-family:inherit;font-size:11px;padding:2px;}
+  .pr input[type=number]{width:64px;}
+  .pd{color:var(--text3);font-size:10px;margin-top:-5px;margin-bottom:7px;padding-left:4px;}
+  .btn{background:var(--accent);color:#000;border:none;padding:8px 24px;font-family:inherit;font-size:13px;font-weight:bold;cursor:pointer;border-radius:2px;display:block;margin:6px auto 0;letter-spacing:.1em;}
+  .btn:hover{background:#6ab4ff;}
+  .sg{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-bottom:16px;}
+  @media(max-width:900px){.sg{grid-template-columns:repeat(3,1fr);}}
+  .sb{background:var(--bg2);border:1px solid var(--border);border-radius:4px;padding:8px 10px;text-align:center;}
+  .sb .lbl{color:var(--text3);font-size:10px;}
+  .sb .val{color:var(--accent);font-size:14px;font-weight:bold;}
+  .sb .val.warn{color:var(--accent3);} .sb .val.ok{color:var(--accent4);}
+  .verdict{text-align:center;font-size:13px;font-weight:bold;padding:8px;border-radius:3px;margin-bottom:16px;}
+  .stable{background:#1a3a1a;color:var(--accent4);border:1px solid var(--accent4);}
+  .vwarn{background:#3a2a1a;color:var(--accent2);border:1px solid var(--accent2);}
+  .crisis{background:#3a1a1a;color:var(--accent3);border:1px solid var(--accent3);}
+  .charts{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+  @media(max-width:900px){.charts{grid-template-columns:1fr;}}
+  .chartbox{background:var(--bg2);border:1px solid var(--border);border-radius:4px;padding:8px;}
+  .chartbox h3{font-size:11px;color:var(--text2);font-weight:normal;margin-bottom:4px;}
+  canvas{width:100%;height:180px;display:block;}
+  .leg{display:flex;flex-wrap:wrap;gap:12px;font-size:10px;margin-top:4px;color:var(--text2);}
+  .ld{display:flex;align-items:center;gap:4px;}
+  .dot{width:18px;height:3px;border-radius:1px;display:inline-block;}
+  .ep{background:var(--bg2);border:1px solid var(--border);border-radius:4px;padding:14px;margin-top:16px;}
+  .ep h2{font-size:12px;color:var(--accent2);margin-bottom:10px;letter-spacing:.1em;}
+  .eq{color:var(--text2);font-size:11px;line-height:1.9;}
+  .eq .nw{color:var(--new);} .eq .cm{color:var(--text3);}
+  .ann{color:var(--text3);font-size:11px;margin-top:8px;line-height:1.8;}
+</style>
+</head>
+<body>
+
+<h1>信用創造ダイナミクス v6 世界版 ― 二つの地域をつなぐ</h1>
+<div class="sub">TWO REGIONS (B: CORE / LARGER, C: SMALLER) | TRADE + FINANCE LINKS | SETTLEMENT BALANCES | CURRENCY UNION OR SEPARATE CURRENCIES</div>
+<div class="vnote">一地域版の信用循環モデルを二つの地域に広げ、貿易(輸入性向・相手)と金融(相手の企業・政府への請求権の保有 = 利子・配当の受け払い)でつないだもの。経常収支とポートフォリオ投資の差は決済残高(TARGET2 のようなもの)に残り、会計は厳密に閉じる。</div>
+<div class="vnote">一地域版: <a href="credit_simulation_v6.html">credit_simulation_v6.html</a> | 分析レポート: <a href="simulation_v6_analysis.html">simulation_v6_analysis</a> | 解説 IPYNB: <a href="https://github.com/JRF-2018/misc_ipynb/blob/master/credit_linkage.ipynb">信用の世界経済は一つか</a> | <a href="https://github.com/JRF-2018/credit_simulation_v6">リポジトリ</a></div>
+
+<div class="grid">
+  <div class="panel">
+    <h2>地域とつながり</h2>
+    <div class="pr"><label>B の大きさ(世界に占める割合)</label><input type="range" id="sB" min="0.5" max="0.9" step="0.05" value="0.6"><span class="val" id="sB_v"></span></div>
+    <div class="pr"><label>つながり方</label><select id="links"><option value="both">貿易 + 金融</option><option value="trade">貿易だけ</option><option value="finance">金融だけ</option><option value="none">つながりなし</option></select></div>
+    <div class="pr"><label>つながりの強さ k</label><input type="range" id="k" min="0.025" max="0.6" step="0.025" value="0.3"><span class="val" id="k_v"></span></div>
+    <div class="pd">大きさに中立なつながり: 輸入性向 = k ×(相手の大きさ)。金融資産の保有も同じ。</div>
+    <div class="pr"><label>C の請求権を B が持つ割合</label><input type="range" id="holdC" min="0" max="1" step="0.05" value="0"><span class="val" id="holdC_v"></span></div>
+    <div class="pd">0 なら大きさに中立。1 なら C の利子・配当はすべて B に払われる(第 12 節)。</div>
+    <div class="pr"><label>金利生活者の消費性向 c_r(B / C)</label><input type="number" id="crB" value="0.35" step="0.05"><input type="number" id="crC" value="0.35" step="0.05"></div>
+    <div class="pr"><label>貸出スプレッド(B / C)</label><input type="number" id="spB" value="0.01" step="0.005"><input type="number" id="spC" value="0.01" step="0.005"></div>
+    <div class="pr"><label>投資の q への反応 g_q</label><input type="range" id="g_q" min="0" max="0.05" step="0.005" value="0"><span class="val" id="g_q_v"></span></div>
+  </div>
+
+  <div class="panel">
+    <h2>通貨・財政・中核と周辺</h2>
+    <div class="pr"><label>通貨</label><select id="cur"><option value="union">共通(通貨統合)</option><option value="fixed">別々・固定相場</option><option value="float">別々・変動相場</option></select></div>
+    <div class="pr"><label>C の切り下げ(新平価 / 年)</label><input type="number" id="devalue" value="1.0" step="0.05"><input type="number" id="dev_t" value="20" step="1"></div>
+    <div class="pd">固定相場のとき。0.7 なら 30% 切り下げ。物価がないので、効果の向きだけを読むこと。</div>
+    <div class="pr"><label>変動相場の規則</label><select id="fxrule"><option value="u">稼働率の差に反応</option><option value="ca">経常収支に反応</option></select></div>
+    <div class="pr"><label>財政</label><select id="fu"><option value="sep">別々</option><option value="union">統合</option><option value="split">統合し 40 年目に分裂</option></select></div>
+    <div class="pr"><label>財政ルール fiscal</label><input type="range" id="fiscal" min="0" max="0.1" step="0.01" value="0"><span class="val" id="fiscal_v"></span></div>
+    <div class="pd">国債比率が 1.5 を超えた分に応じて増税する強さ(統合中は統合全体の比率)。</div>
+    <hr style="border:none;border-top:1px solid var(--border);margin:8px 0;">
+    <div class="pr"><label>競争力による貿易配分</label><select id="cp"><option value="0">使わない</option><option value="1">使う(中核と周辺)</option></select></div>
+    <div class="pr"><label>累積的因果 v / C の競争力</label><input type="number" id="verd" value="1.0" step="0.5"><input type="number" id="AC" value="0.9" step="0.05"></div>
+    <div class="pd">v が閾値(約 3)を超えると周辺 C はほとんど消える。</div>
+  </div>
+
+  <div class="panel">
+    <h2>ショック・プリセット</h2>
+    <div class="pr"><label>プリセット</label><select id="preset"></select></div>
+    <div class="pr"><label>ショック</label><select id="sh_param"><option>(なし)</option><option>g0</option><option>c_r</option><option>prem</option><option>r_cb</option><option>gG</option><option>omega</option></select><select id="sh_reg"><option value="C">C</option><option value="B">B</option><option value="both">両方</option></select></div>
+    <div class="pr"><label>値 / 時刻(年)/ 期間(年)</label><input type="number" id="sh_value" step="0.005"><input type="number" id="sh_t" value="20" step="1"><input type="number" id="sh_dur" value="5" step="0.5"></div>
+    <div class="pd">指定した年から、その値に 1 年かけて動かし、「期間」の後に元へ戻す(期間 0 なら戻さない)。</div>
+    <div class="pr"><label>期間 T(年)</label><input type="range" id="T" min="40" max="200" step="10" value="60"><span class="val" id="T_v"></span></div>
+    <button class="btn" onclick="runSim()">▶ 実行</button>
+  </div>
+</div>
+
+<div class="sg" id="stats"></div>
+<div class="verdict" id="verdict">—</div>
+
+<div class="charts">
+  <div class="chartbox"><h3>ショックなしの基準経路との比(所得 Y。世界は通貨 0 建て)</h3><canvas id="c_rel"></canvas><div class="leg" id="l_rel"></div></div>
+  <div class="chartbox"><h3>B が世界の所得に占める割合(構成比)</h3><canvas id="c_share"></canvas><div class="leg" id="l_share"></div></div>
+  <div class="chartbox"><h3>対外純資産 / 所得</h3><canvas id="c_nfa"></canvas><div class="leg" id="l_nfa"></div></div>
+  <div class="chartbox"><h3>国債 / 所得</h3><canvas id="c_debt"></canvas><div class="leg" id="l_debt"></div></div>
+  <div class="chartbox"><h3>外国との利子・配当の受け払い / 所得(受け取り − 支払い)</h3><canvas id="c_inc"></canvas><div class="leg" id="l_inc"></div></div>
+  <div class="chartbox"><h3>為替 e(C の通貨の価値)と成長率</h3><canvas id="c_fx"></canvas><div class="leg" id="l_fx"></div></div>
+</div>
+
+<div class="ep">
+  <h2>つなぎ方(1 期 = 0.1 年)</h2>
+  <div class="eq">
+<span class="cm">// 貿易: 地域 j の支出 D_j のうち m_j を輸入。Z[i, j] = 地域 j の支出のうち地域 i の生産になる割合</span><br>
+Y = Z (C Y + a)　(連立一次方程式。生産能力を超えた分は、すべての買い手に同じ割合で割り当て、残りは強制貯蓄)<br>
+<span class="cm">// 金融: hold[j, i] = 地域 j の企業・政府への請求権のうち、地域 i の金利生活者が持つ割合</span><br>
+金利生活者 i の受け取り = Σ_j hold[j, i]·(r_L,j L_j + r_cb B_j + 配当_j) + r_cb S_i<br>
+<span class="cm">// 会計を閉じる決済残高</span><br>
+<span class="nw">ΔS_i = 経常収支_i − ポートフォリオ投資_i</span>,　Σ_i S_i = 0,　世界の経常収支の和 = 0<br>
+<span class="cm">// 中核と周辺(使うとき): 支出の配分は売り手の生産能力と競争力 A に比例</span><br>
+S_ij ∝ K_i A_i^θ φ^[i≠j],　d ln A_i/dt = v (g_i − ḡ) − χ (u_i − ū) − η ln A_i<br>
+<span class="cm">// 通貨が別々のとき: 地域の間の流れを為替 e で換算。輸入は相対価格に反応(弾力性 η)</span><br>
+変動相場: d ln e/dt = k_u (u_C − u_B)(または k_ca × 経常収支_C / Y_C)
+  </div>
+  <div class="ann">
+    このモデルには物価がない。為替の動きは、そのまま恒久的な実質為替レートの変化になる。だから、通貨の設定では、効果の向きだけを読み、大きさは読まないこと。<br>
+    釣り合いの取れた成長経路の上では、世界の合計は、流れで重み付けたパラメータの一国モデルで厳密に描ける(リポジトリの Lean の定理 A)。ショックや為替があると、そのずれが出る。
+  </div>
+</div>
+
+<script src="world_v6.js"></script>
+<script>
+'use strict';
+const C = window.CreditV6;
+const SLIDERS = ['sB', 'k', 'holdC', 'g_q', 'fiscal', 'T'];
+const PRESETS = {
+  '基準(6:4、貿易 + 金融)': {},
+  'C だけの投資の落ち込み': {shock: ['g0', 'C', -0.08, 20, 5]},
+  'C だけの落ち込み(つながりなし)': {set: {links: 'none'}, shock: ['g0', 'C', -0.08, 20, 5]},
+  'C だけの落ち込み(貿易だけ)': {set: {links: 'trade'}, shock: ['g0', 'C', -0.08, 20, 5]},
+  'C だけの落ち込み + 財政統合(財政ルール)': {set: {fu: 'union', fiscal: 0.03}, shock: ['g0', 'C', -0.08, 20, 5]},
+  'C だけの落ち込み + 30% 切り下げ': {set: {cur: 'fixed', devalue: 0.7, dev_t: 20}, shock: ['g0', 'C', -0.08, 20, 5]},
+  'C だけの落ち込み + 変動相場(稼働率の差)': {set: {cur: 'float', fxrule: 'u'}, shock: ['g0', 'C', -0.08, 20, 5]},
+  'C だけの落ち込み + 変動相場(経常収支)': {set: {cur: 'float', fxrule: 'ca'}, shock: ['g0', 'C', -0.08, 20, 5]},
+  'B だけの楽観(ブーム)': {set: {g_q: 0.03}, shock: ['prem', 'B', 0.008, 5, 0]},
+  'C の金利生活者が使わなくなる': {shock: ['c_r', 'C', 0.15, 20, 0]},
+  '中核と周辺(構造的な格差)': {set: {cp: '1', verd: 1.0, AC: 0.9, spC: 0.03, k: 0.125, holdC: 0.4, T: 200}},
+  '中核と周辺(累積的因果が閾値の上)': {set: {cp: '1', verd: 4.0, AC: 0.99, spC: 0.01, holdC: 0, T: 200}},
+  'C の利子・配当をすべて B に払う': {set: {holdC: 1.0, T: 100}},
+};
+const DEFAULT_IDS = ['sB', 'links', 'k', 'holdC', 'crB', 'crC', 'spB', 'spC', 'g_q', 'cur', 'devalue', 'dev_t', 'fxrule', 'fu', 'fiscal', 'cp', 'verd', 'AC', 'T'];
+const DEFAULTS = {};
+DEFAULT_IDS.forEach(id => DEFAULTS[id] = document.getElementById(id).value);
+const fmt = (id, v) => id === 'T' ? v.toFixed(0) : v.toFixed(3);
+SLIDERS.forEach(id => { const el = document.getElementById(id), ve = document.getElementById(id + '_v');
+  const u = () => ve.textContent = fmt(id, parseFloat(el.value)); el.addEventListener('input', u); u(); });
+const psel = document.getElementById('preset');
+Object.keys(PRESETS).forEach(k => { const o = document.createElement('option'); o.value = k; o.textContent = k; psel.appendChild(o); });
+psel.addEventListener('change', () => {
+  const pr = PRESETS[psel.value];
+  DEFAULT_IDS.forEach(id => document.getElementById(id).value = DEFAULTS[id]);
+  if (pr.set) for (const k in pr.set) document.getElementById(k).value = pr.set[k];
+  document.getElementById('sh_param').value = pr.shock ? pr.shock[0] : '(なし)';
+  document.getElementById('sh_reg').value = pr.shock ? pr.shock[1] : 'C';
+  document.getElementById('sh_value').value = pr.shock ? pr.shock[2] : '';
+  document.getElementById('sh_t').value = pr.shock ? pr.shock[3] : 20;
+  document.getElementById('sh_dur').value = pr.shock ? pr.shock[4] : 5;
+  SLIDERS.forEach(id => document.getElementById(id).dispatchEvent(new Event('input')));
+  runSim();
+});
+const num = id => parseFloat(document.getElementById(id).value);
+const val = id => document.getElementById(id).value;
+
+function buildConfig(){
+  const sB = num('sB'), s = [sB, 1 - sB], k = num('k'), links = val('links');
+  const NL = C.neutralLinks(s, k);
+  const cfg = {T: num('T'), K0: [250 * sB, 250 * (1 - sB)], c_r: [num('crB'), num('crC')], spread: [num('spB'), num('spC')], g_q: num('g_q'),
+               fiscal: num('fiscal'), b_target: 1.5};
+  if (links === 'both' || links === 'trade') cfg.m = NL.m;
+  let hold = (links === 'both' || links === 'finance') ? NL.hold.map(r => r.slice()) : [[1, 0], [0, 1]];
+  const hC = num('holdC');
+  if (hC > 0) hold[1] = [hC, 1 - hC];
+  cfg.hold = hold;
+  if (val('fu') === 'union') cfg.fiscal_union = [0, 1e9];
+  if (val('fu') === 'split') cfg.fiscal_union = [0, 40];
+  if (val('cur') === 'fixed') cfg.fx = {currency: [0, 1], regime: 'fixed', eta: 1.0,
+    shifts: num('devalue') !== 1 ? [[num('dev_t'), num('devalue'), 1.0]] : []};
+  if (val('cur') === 'float') cfg.fx = val('fxrule') === 'u'
+    ? {currency: [0, 1], regime: 'float', eta: 1.5, k_ca: 0, k_r: 0, k_u: 0.5}
+    : {currency: [0, 1], regime: 'float', eta: 1.5, k_ca: 1.0, k_r: 0};
+  if (val('cp') === '1') { cfg.phi_trade = 0.5; cfg.A0 = [1.0, num('AC')]; cfg.verdoorn = num('verd'); cfg.price_adj = 0.5; cfg.init = null; delete cfg.m; }
+  return cfg;
+}
+function buildShocks(){
+  const k = val('sh_param'), v = num('sh_value');
+  if (k === '(なし)' || !isFinite(v)) return [];
+  const reg = val('sh_reg');
+  const baseVal = {g0: -0.02, c_r: null, prem: 0.02, r_cb: 0.03, gG: 0.2, omega: 0.65}[k];
+  const cr = [num('crB'), num('crC')];
+  const b = k === 'c_r' ? cr : [baseVal, baseVal];
+  const target = reg === 'both' ? [v, v] : (reg === 'B' ? [v, b[1]] : [b[0], v]);
+  const t0 = num('sh_t'), dur = num('sh_dur');
+  const sh = [[t0, {[k]: target}, 1.0]];
+  if (dur > 0) sh.push([t0 + dur, {[k]: b}, 1.0]);
+  return sh;
+}
+
+function drawChart(id, legId, series, opt){
+  opt = opt || {};
+  const cv = document.getElementById(id), dpr = window.devicePixelRatio || 1;
+  cv.width = cv.offsetWidth * dpr; cv.height = cv.offsetHeight * dpr;
+  const ctx = cv.getContext('2d'); ctx.scale(dpr, dpr);
+  const W = cv.offsetWidth, H = cv.offsetHeight, pad = {l:46, r:10, t:8, b:22};
+  const pw = W - pad.l - pad.r, ph = H - pad.t - pad.b;
+  ctx.fillStyle = '#181c27'; ctx.fillRect(0, 0, W, H);
+  let lo = Infinity, hi = -Infinity;
+  series.forEach(s => s.data.forEach(v => { if (isFinite(v)) { lo = Math.min(lo, v); hi = Math.max(hi, v); } }));
+  if (opt.ref !== undefined) { lo = Math.min(lo, opt.ref); hi = Math.max(hi, opt.ref); }
+  if (!(hi > lo)) { hi = lo + 1; }
+  const m = (hi - lo) * 0.08; lo -= m; hi += m;
+  const n = series[0].data.length, T = opt.T;
+  const X = i => pad.l + pw * i / (n - 1), Yy = v => pad.t + ph * (1 - (v - lo) / (hi - lo));
+  ctx.strokeStyle = '#2a3050'; ctx.lineWidth = 0.5; ctx.fillStyle = '#5a6080'; ctx.font = '9px Courier New'; ctx.textAlign = 'right';
+  for (let k = 0; k <= 4; k++) { const v = lo + (hi - lo) * k / 4, y = Yy(v);
+    ctx.beginPath(); ctx.moveTo(pad.l, y); ctx.lineTo(pad.l + pw, y); ctx.stroke(); ctx.fillText(v.toFixed(Math.abs(hi - lo) < 0.5 ? 3 : 2), pad.l - 3, y + 3); }
+  ctx.textAlign = 'center';
+  for (let k = 0; k <= 4; k++) { const i = Math.round((n - 1) * k / 4); ctx.fillText((T * k / 4).toFixed(0), X(i), H - 6); }
+  if (opt.ref !== undefined) { ctx.strokeStyle = '#5a6080'; ctx.setLineDash([3, 3]); ctx.beginPath(); ctx.moveTo(pad.l, Yy(opt.ref)); ctx.lineTo(pad.l + pw, Yy(opt.ref)); ctx.stroke(); ctx.setLineDash([]); }
+  series.forEach(s => { ctx.beginPath(); ctx.strokeStyle = s.color; ctx.lineWidth = 2;
+    s.data.forEach((v, i) => { const y = Yy(Math.min(Math.max(v, lo), hi)); i ? ctx.lineTo(X(i), y) : ctx.moveTo(X(i), y); }); ctx.stroke(); });
+  document.getElementById(legId).innerHTML = series.map(s => `<div class="ld"><div class="dot" style="background:${s.color}"></div>${s.label}</div>`).join('');
+}
+const COL = ['#4a9eff', '#f0a500', '#50c878', '#e05555', '#a78bfa'];
+const stat = (l, v, c) => `<div class="sb"><div class="lbl">${l}</div><div class="val ${c || ''}">${v}</div></div>`;
+
+function runSim(){
+  const cfg = buildConfig(), shocks = buildShocks();
+  const baseCfg = Object.assign({}, cfg, {shocks: []});
+  if (baseCfg.fx && baseCfg.fx.shifts) baseCfg.fx = Object.assign({}, baseCfg.fx, {shifts: []});
+  const base = C.simulateWorld(2, baseCfg);
+  const h = C.simulateWorld(2, Object.assign({}, cfg, {shocks}));
+  const n = h.Y.length, last = n - 1, T = cfg.T;
+  const col = (o, k, j) => o[k].map(r => r[j]);
+  const worldNum = o => o.Y.map((r, i) => r[0] * o.cv[i][0] + r[1] * o.cv[i][1]);
+  const relB = col(h, 'Y', 0).map((v, i) => v / base.Y[i][0]), relC = col(h, 'Y', 1).map((v, i) => v / base.Y[i][1]);
+  const wN = worldNum(h), wB = worldNum(base), relW = wN.map((v, i) => v / wB[i]);
+  drawChart('c_rel', 'l_rel', [{label: 'B', data: relB, color: COL[0]}, {label: 'C', data: relC, color: COL[1]}, {label: '世界', data: relW, color: COL[2]}], {T, ref: 1});
+  const share = h.Y.map((r, i) => r[0] * h.cv[i][0] / wN[i]);
+  drawChart('c_share', 'l_share', [{label: 'B の比重', data: share, color: COL[0]}], {T});
+  drawChart('c_nfa', 'l_nfa', [{label: 'B', data: h.NFA.map((r, i) => r[0] / h.Y[i][0]), color: COL[0]}, {label: 'C', data: h.NFA.map((r, i) => r[1] / h.Y[i][1]), color: COL[1]}], {T, ref: 0});
+  drawChart('c_debt', 'l_debt', [{label: 'B', data: h.B.map((r, i) => r[0] / h.Y[i][0]), color: COL[0]}, {label: 'C', data: h.B.map((r, i) => r[1] / h.Y[i][1]), color: COL[1]}], {T});
+  drawChart('c_inc', 'l_inc', [{label: 'B', data: h.rent_in.map((r, i) => (r[0] - h.pay[i][0]) / h.Y[i][0]), color: COL[0]}, {label: 'C', data: h.rent_in.map((r, i) => (r[1] - h.pay[i][1]) / h.Y[i][1]), color: COL[1]}], {T, ref: 0});
+  drawChart('c_fx', 'l_fx', [{label: 'e', data: h.e.map(r => r[0]), color: COL[4]}, {label: 'g(B)', data: col(h, 'g', 0), color: COL[0]}, {label: 'g(C)', data: col(h, 'g', 1), color: COL[1]}], {T});
+  const minB = Math.min(...relB), minC = Math.min(...relC), minW = Math.min(...relW);
+  const netC = (h.rent_in[last][1] - h.pay[last][1]) / h.Y[last][1];
+  const sbErr = Math.max(...h.sb_err.map(r => Math.max(Math.abs(r[0]), Math.abs(r[1]))));
+  document.getElementById('stats').innerHTML = [
+    stat('世界 Y / 基準(最低)', minW.toFixed(3), minW < 0.85 ? 'warn' : ''),
+    stat('B Y / 基準(最低)', minB.toFixed(3), minB < 0.85 ? 'warn' : ''),
+    stat('C Y / 基準(最低)', minC.toFixed(3), minC < 0.85 ? 'warn' : ''),
+    stat('B の比重(最初 → 最後)', share[0].toFixed(2) + '→' + share[last].toFixed(2)),
+    stat('成長率 B / C', (100 * h.g[last][0]).toFixed(2) + '/' + (100 * h.g[last][1]).toFixed(2) + '%'),
+    stat('為替 e(最後)', h.e[last][0].toFixed(3)),
+    stat('対外純資産/Y B', (h.NFA[last][0] / h.Y[last][0]).toFixed(2)),
+    stat('対外純資産/Y C', (h.NFA[last][1] / h.Y[last][1]).toFixed(2), h.NFA[last][1] / h.Y[last][1] < -2 ? 'warn' : ''),
+    stat('国債/Y B', (h.B[last][0] / h.Y[last][0]).toFixed(2)),
+    stat('国債/Y C', (h.B[last][1] / h.Y[last][1]).toFixed(2)),
+    stat('C が外国に払う純額 / Y', (100 * -netC).toFixed(1) + '%', -netC > 0.1 ? 'warn' : ''),
+    stat('部門収支の誤差', sbErr.toExponential(1), sbErr > 1e-6 ? 'warn' : 'ok'),
+  ].join('');
+  const vEl = document.getElementById('verdict');
+  let cls = 'stable', msg = '✅ 二つの地域が同じ率で成長している';
+  if (share[last] > 0.95) { cls = 'crisis'; msg = '❌ 周辺 C がほとんど消えた(累積的因果が強すぎる)'; }
+  else if (minW < 0.85) { cls = 'vwarn'; msg = '⚠️ 世界の所得が基準の 85% を下回った(ショックが伝染している)'; }
+  else if (Math.min(minB, minC) < 0.85) { cls = 'vwarn'; msg = '⚠️ 一方の地域が深く落ち込んだ(もう一方に押し出された、または伝染した)'; }
+  else if (-netC > 0.1) { cls = 'vwarn'; msg = '⚠️ C が所得の 1 割以上を利子・配当として外国に払い続けている(金融の形の不等価交換)'; }
+  else if (Math.abs(share[last] - share[0]) > 0.05) { cls = 'vwarn'; msg = '⚠️ 構成比が動いている(一国への縮約がずれる)'; }
+  vEl.className = 'verdict ' + cls; vEl.textContent = msg;
+}
+runSim();
+</script>
+</body>
+</html>
