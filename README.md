@@ -19,7 +19,7 @@
 * [信用の世界経済は一つか ―― 国のモデルを連結し、縮約し、射影する](notebooks/credit_linkage.ipynb)
   * HTML: https://jrf-2018.github.io/credit_simulation_v6/credit_linkage.html
 
-どちらも、上から順に実行すれば全部動きます(numpy, scipy, matplotlib。Google Colab でも動きます)。Lean のセルは最後にまとめてチェックします(Lean がない環境では elan と Mathlib を入れるので時間がかかります)。
+どちらも、上から順に実行すれば全部動きます(numpy, scipy, matplotlib。Google Colab でも動きます)。Lean のセルは最後にまとめてチェックします(Lean がない環境では elan と Mathlib を入れるので時間がかかります)。「信用の世界経済は一つか」の最後では、このリポジトリを `git clone` して `CreditV6/`(定理 A・B・C)もビルドします。
 
 ## v6 のモデル(v5 との違い)
 

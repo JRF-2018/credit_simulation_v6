@@ -5,54 +5,57 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>信用創造ダイナミクス v6</title>
 <style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;600&family=DM+Mono:wght@400;500&display=swap');
   :root {
-    --bg:#0f1117;--bg2:#181c27;--border:#2a3050;--accent:#4a9eff;--accent2:#f0a500;
-    --accent3:#e05555;--accent4:#50c878;--new:#a78bfa;
-    --text:#cdd5f0;--text2:#8890b0;--text3:#5a6080;
+    --bg:#f5f0e8;--bg2:#faf7f2;--border:#d4c9b0;--accent:#1a5c8a;--accent2:#7a4a1a;
+    --accent3:#b84a1a;--accent4:#2a7a3a;--new:#5a1a8a;
+    --text:#2a2018;--text2:#4a3c2c;--text3:#7a6a52;
   }
   *{box-sizing:border-box;margin:0;padding:0;}
-  body{background:var(--bg);color:var(--text);font-family:'Courier New',monospace;font-size:13px;line-height:1.6;padding:20px;max-width:1200px;margin:0 auto;}
+  body{background:var(--bg);color:var(--text);font-family:'Noto Serif JP',serif;font-size:14px;line-height:1.7;padding:20px;max-width:1200px;margin:0 auto;}
   a{color:var(--accent);}
-  h1{font-size:18px;color:var(--accent);border-bottom:1px solid var(--border);padding-bottom:8px;margin-bottom:6px;}
-  .sub{color:var(--text2);font-size:11px;margin-bottom:4px;}
-  .vnote{color:var(--new);font-size:11px;margin-bottom:6px;}
+  h1{font-size:19px;font-weight:600;color:var(--text);border-bottom:2px solid var(--text);padding-bottom:8px;margin-bottom:6px;}
+  .sub{color:var(--text2);font-size:12px;margin-bottom:4px;}
+  .vnote{color:var(--new);font-size:12px;margin-bottom:6px;}
   .grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin:16px 0;}
   @media(max-width:900px){.grid{grid-template-columns:1fr;}}
   .panel{background:var(--bg2);border:1px solid var(--border);border-radius:4px;padding:14px;}
-  .panel h2{font-size:12px;color:var(--accent2);margin-bottom:12px;letter-spacing:.1em;}
+  .panel h2{font-size:13px;color:var(--accent2);margin-bottom:12px;letter-spacing:.1em;}
   .pr{display:flex;align-items:center;margin-bottom:8px;gap:8px;}
-  .pr label{flex:1;color:var(--text2);font-size:11px;}
+  .pr label{flex:1;color:var(--text2);font-size:12px;}
   .pr input[type=range]{width:110px;accent-color:var(--accent);}
-  .pr .val{width:52px;text-align:right;color:var(--accent);font-size:12px;}
-  .pr select,.pr input[type=number]{background:var(--bg);color:var(--text);border:1px solid var(--border);font-family:inherit;font-size:11px;padding:2px;}
+  .pr .val{width:52px;text-align:right;color:var(--accent);font-size:13px;}
+  .pr select,.pr input[type=number]{background:var(--bg);color:var(--text);border:1px solid var(--border);font-family:inherit;font-size:12px;padding:2px;}
   .pr input[type=number]{width:70px;}
-  .pd{color:var(--text3);font-size:10px;margin-top:-5px;margin-bottom:7px;padding-left:4px;}
-  .btn{background:var(--accent);color:#000;border:none;padding:8px 24px;font-family:inherit;font-size:13px;font-weight:bold;cursor:pointer;border-radius:2px;display:block;margin:6px auto 0;letter-spacing:.1em;}
-  .btn:hover{background:#6ab4ff;}
+  .pd{color:var(--text3);font-size:11px;margin-top:-5px;margin-bottom:7px;padding-left:4px;}
+  .btn{background:var(--accent);color:#fff;border:none;padding:8px 24px;font-family:inherit;font-size:13px;font-weight:bold;cursor:pointer;border-radius:2px;display:block;margin:6px auto 0;letter-spacing:.1em;}
+  .btn:hover{background:#2a6c9a;}
   .sg{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-bottom:16px;}
   @media(max-width:900px){.sg{grid-template-columns:repeat(3,1fr);}}
   .sb{background:var(--bg2);border:1px solid var(--border);border-radius:4px;padding:8px 10px;text-align:center;}
-  .sb .lbl{color:var(--text3);font-size:10px;}
+  .sb .lbl{color:var(--text3);font-size:11px;}
   .sb .val{color:var(--accent);font-size:14px;font-weight:bold;}
   .sb .val.warn{color:var(--accent3);} .sb .val.ok{color:var(--accent4);}
   .verdict{text-align:center;font-size:13px;font-weight:bold;padding:8px;border-radius:3px;margin-bottom:16px;}
-  .stable{background:#1a3a1a;color:var(--accent4);border:1px solid var(--accent4);}
-  .vwarn{background:#3a2a1a;color:var(--accent2);border:1px solid var(--accent2);}
-  .crisis{background:#3a1a1a;color:var(--accent3);border:1px solid var(--accent3);}
+  .stable{background:#e4efe0;color:var(--accent4);border:1px solid var(--accent4);}
+  .vwarn{background:#f4e9d2;color:var(--accent2);border:1px solid var(--accent2);}
+  .crisis{background:#f6e2d8;color:var(--accent3);border:1px solid var(--accent3);}
   .charts{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
   @media(max-width:900px){.charts{grid-template-columns:1fr;}}
   .chartbox{background:var(--bg2);border:1px solid var(--border);border-radius:4px;padding:8px;}
-  .chartbox h3{font-size:11px;color:var(--text2);font-weight:normal;margin-bottom:4px;}
-  canvas{width:100%;height:180px;display:block;}
-  .leg{display:flex;flex-wrap:wrap;gap:12px;font-size:10px;margin-top:4px;color:var(--text2);}
+  .chartbox h3{font-size:12px;color:var(--text2);font-weight:normal;margin-bottom:4px;}
+  canvas{width:100%;height:190px;display:block;}
+  .leg{display:flex;flex-wrap:wrap;gap:12px;font-size:11px;margin-top:4px;color:var(--text2);}
   .ld{display:flex;align-items:center;gap:4px;}
   .dot{width:18px;height:3px;border-radius:1px;display:inline-block;}
   .ep{background:var(--bg2);border:1px solid var(--border);border-radius:4px;padding:14px;margin-top:16px;}
-  .ep h2{font-size:12px;color:var(--accent2);margin-bottom:10px;letter-spacing:.1em;}
-  .eq{color:var(--text2);font-size:11px;line-height:1.9;}
+  .ep h2{font-size:13px;color:var(--accent2);margin-bottom:10px;letter-spacing:.1em;}
+  .eq{color:var(--text2);font-size:12px;line-height:1.9;}
   .eq .nw{color:var(--new);} .eq .cm{color:var(--text3);}
-  .ann{color:var(--text3);font-size:11px;margin-top:8px;line-height:1.8;}
-  .tabs{margin:8px 0 0;font-size:12px;}
+  .ann{color:var(--text3);font-size:12px;margin-top:8px;line-height:1.8;}
+  .tabs{margin:8px 0 0;font-size:13px;}
+
+  .sub,.vnote,.val,.eq,.btn,input,select,.pd{font-family:'DM Mono','Noto Serif JP',monospace;}
 </style>
 </head>
 <body>
@@ -217,27 +220,29 @@ function drawChart(id, legId, series, opt){
   const ctx = cv.getContext('2d'); ctx.scale(dpr, dpr);
   const W = cv.offsetWidth, H = cv.offsetHeight, pad = {l:46, r:10, t:8, b:22};
   const pw = W - pad.l - pad.r, ph = H - pad.t - pad.b;
-  ctx.fillStyle = '#181c27'; ctx.fillRect(0, 0, W, H);
+  ctx.fillStyle = '#fffdf8'; ctx.fillRect(0, 0, W, H);
   let lo = Infinity, hi = -Infinity;
   series.forEach(s => s.data.forEach(v => { if (isFinite(v)) { lo = Math.min(lo, v); hi = Math.max(hi, v); } }));
   if (opt.min !== undefined) lo = Math.min(lo, opt.min);
   if (opt.max !== undefined) hi = Math.max(hi, opt.max);
-  if (!(hi > lo)) { hi = lo + 1; }
+  // 幅が水準の 1e-4 未満なら(丸め誤差だけの動き)広げて、平らな線として描く
+  const sp = 1e-4 * Math.max(1, Math.abs(hi), Math.abs(lo));
+  if (!(hi - lo > sp)) { const c = isFinite(hi + lo) ? (hi + lo) / 2 : 0; lo = c - sp / 2; hi = c + sp / 2; }
   const m = (hi - lo) * 0.08; lo -= m; hi += m;
   const n = series[0].data.length, T = opt.T;
   const X = i => pad.l + pw * i / (n - 1), Yy = v => pad.t + ph * (1 - (v - lo) / (hi - lo));
-  ctx.strokeStyle = '#2a3050'; ctx.lineWidth = 0.5; ctx.fillStyle = '#5a6080'; ctx.font = '9px Courier New'; ctx.textAlign = 'right';
+  ctx.strokeStyle = '#e4dccb'; ctx.lineWidth = 0.7; ctx.fillStyle = '#7a6a52'; ctx.font = '10px "DM Mono", monospace'; ctx.textAlign = 'right';
   for (let k = 0; k <= 4; k++) { const v = lo + (hi - lo) * k / 4, y = Yy(v);
     ctx.beginPath(); ctx.moveTo(pad.l, y); ctx.lineTo(pad.l + pw, y); ctx.stroke(); ctx.fillText(v.toFixed(Math.abs(hi - lo) < 0.5 ? 3 : 2), pad.l - 3, y + 3); }
   ctx.textAlign = 'center';
   for (let k = 0; k <= 4; k++) { const i = Math.round((n - 1) * k / 4); ctx.fillText((T * k / 4).toFixed(0), X(i), H - 6); }
   if (opt.band) { opt.band.forEach((c, i) => { if (i > 0) { ctx.fillStyle = c; ctx.fillRect(X(i - 1), pad.t, X(i) - X(i - 1) + 0.5, 8); } }); }
-  if (opt.ref !== undefined) { ctx.strokeStyle = '#5a6080'; ctx.setLineDash([3, 3]); ctx.beginPath(); ctx.moveTo(pad.l, Yy(opt.ref)); ctx.lineTo(pad.l + pw, Yy(opt.ref)); ctx.stroke(); ctx.setLineDash([]); }
+  if (opt.ref !== undefined) { ctx.strokeStyle = '#8a7a62'; ctx.setLineDash([3, 3]); ctx.beginPath(); ctx.moveTo(pad.l, Yy(opt.ref)); ctx.lineTo(pad.l + pw, Yy(opt.ref)); ctx.stroke(); ctx.setLineDash([]); }
   series.forEach(s => { ctx.beginPath(); ctx.strokeStyle = s.color; ctx.lineWidth = 2;
     s.data.forEach((v, i) => { const y = Yy(Math.min(Math.max(v, lo), hi)); i ? ctx.lineTo(X(i), y) : ctx.moveTo(X(i), y); }); ctx.stroke(); });
   document.getElementById(legId).innerHTML = series.map(s => `<div class="ld"><div class="dot" style="background:${s.color}"></div>${s.label}</div>`).join('');
 }
-const COL = ['#4a9eff', '#f0a500', '#50c878', '#e05555', '#a78bfa'];
+const COL = ['#1a5c8a', '#c8960a', '#2a7a3a', '#b84a1a', '#5a1a8a'];
 
 function stat(label, v, cls){ return `<div class="sb"><div class="lbl">${label}</div><div class="val ${cls||''}">${v}</div></div>`; }
 
@@ -253,7 +258,7 @@ function runSim(){
   drawChart('c_debt', 'l_debt', [{label:'L / Y', data:h.L_Y, color:COL[0]}, {label:'B / Y', data:h.B_Y, color:COL[1]}], {T, min:0});
   drawChart('c_rate', 'l_rate', [{label:'g', data:h.g, color:COL[0]}, {label:'r_L', data:h.r_L, color:COL[1]}, {label:'δ', data:h.delta, color:COL[2]}], {T});
   drawChart('c_util', 'l_util', [{label:'u', data:h.u, color:COL[0]}, {label:'q = E/K', data:h.q, color:COL[1]}, {label:'雇用率', data:h.emp, color:COL[2]}], {T, ref:1});
-  const band = Array.from(h.minsky, v => v === 2 ? '#50c878' : (v === 1 ? '#f0a500' : '#e05555'));
+  const band = Array.from(h.minsky, v => v === 2 ? '#2a7a3a' : (v === 1 ? '#c8960a' : '#b84a1a'));
   drawChart('c_min', 'l_min', [{label:'ρ + cu', data:h.rho_eff, color:COL[4]}], {T, min:0, band});
   const g = h.g[last], ponzi = h.minsky.some(v => v === 0), lossMax = Math.max(...h.loss_rate);
   const byGrowth = h.B_Y[last] > 2 * h.B_Y[Math.floor(n / 2)] && h.B_Y[last] > 4;
