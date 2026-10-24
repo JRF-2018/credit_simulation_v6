@@ -97,6 +97,13 @@ WORLD_KEYS = [
     'tau',        # 税率(財政ルールで動く)
     'e',          # 為替レート(通貨 1 の価値を通貨 0 で測ったもの)
     'cv',         # 自国通貨 1 単位の、通貨 0 での価値
+    # 折れ目までの距離(負・0 なら、その折れ目が効いている。モデルが微分できなくなる所を見るため)
+    'mg_inv',     # 望む粗投資率 d0 + g_net(0 で投資の下限 max(0, ·))
+    'mg_cf',      # 企業の現金収支/所得 CF/Y(0 で貸倒れが始まる)
+    'mg_eg',      # 株式的富の伸び率(年。0 で在庫維持能力の喪失 κ が効き始める)
+    'mg_loss',    # 0.1 − 貸倒れ率(0 で金利への上乗せが頭打ち)
+    'mg_cap',     # (生産能力 − 需要)/生産能力(なめらかな min の角。幅 0.01)
+    'mg_col',     # (担保の上限による借入 − 望む借入)/資本(なめらかな min の角。幅 0.01)
 ]
 
 
@@ -184,6 +191,7 @@ def simulate_world(N=2, **kw):
         r_B = P['r_cb']
         wE = 0.001 * K                                    # なめらかさの幅は資本に比例させる(規模について同次に保つ)
         E = wE * np.logaddexp(0.0, Pi_e / wE) / (0.005 * np.logaddexp(0.0, (r_L + P['prem']) / 0.005) + 0.005)
+        e_growth = (E - E_prev) / E_prev / dt if E_prev is not None else np.full(N, np.nan)
         if E_prev is not None:
             stress = np.maximum(0.0, -(E - E_prev) / np.maximum(E_prev, 1e-9)) / dt
             delta = P['d0'] * (1 + P['kappa'] * stress)
@@ -260,7 +268,9 @@ def simulate_world(N=2, **kw):
                    NFA=Fc.T @ (L + B) - (L + B) + S / cv, rent_in=rent_in, r_L=r_L, u=Y / Y_k,
                    g=(I - delta * K) / K, Phi=r_L * L / Y, theta_star=(pi_sh * Y - P['d0'] * K) / Y,
                    q=E / K, delta=delta, emp=emp, omega=omega, tax=tax, G=G, sb_err=sb_err, tau=tau,
-                   pay=pay_j, I=I, Pi_e=Pi_e, A=A.copy(), m=P['m'].copy(), tr=tr, e=np.full(N, e), cv=cv)
+                   pay=pay_j, I=I, Pi_e=Pi_e, A=A.copy(), m=P['m'].copy(), tr=tr, e=np.full(N, e), cv=cv,
+                   mg_inv=P['d0'] + g_net, mg_cf=CF / Y, mg_eg=e_growth, mg_loss=0.1 - loss_rate,
+                   mg_cap=(Y_p - Yd) / Y_p, mg_col=((P['lam'] * (E + K) - L) / P['T_adj'] - (I_des - retained)) / K)
         out['t'][i] = t
         for k, val in rec.items():
             out[k][i] = val
