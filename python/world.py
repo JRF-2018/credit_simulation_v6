@@ -45,7 +45,7 @@ WORLD_STRUCT = dict(
     hold=None,      # hold[j, i]: 地域 j の企業の借入・国債への請求権のうち、地域 i の金利生活者が持つ割合(行の和 1)。None なら単位行列
     K0=None,        # 地域ごとの初期の資本(None なら 250 を N 等分)
     init='steady',  # 'steady': 予備走行(κ=0, ショックなし)で釣り合った比率を求めて初期値にする
-    state=None,     # 初期状態を直接与える辞書(K, L, B, S, Pi_e)。与えたときは init を無視する
+    state=None,     # 初期状態を直接与える辞書(K, L, B, S, Pi_e。Lean の State と同じ E_prev, Y_prev, loss, u_prev も与えられる)。与えたときは init を無視する
     phi_trade=None, # 貿易の自由度 φ(0〜1)。与えると、支出の地域への配分を競争力 A から
                     # S_ij = K_i A_i^θ φ^{[i≠j]} / Σ_k K_k A_k^θ φ^{[k≠j]} で決め、m と trade はそれで上書きする
     A0=None,        # 競争力の初期値(None なら全地域 1)
@@ -135,8 +135,13 @@ def simulate_world(N=2, **kw):
         f = K.sum() / pre['K'][-1].sum()
         K, L, B, S, Pi_e = (pre[k][-1] * f for k in ('K', 'L', 'B', 'S', 'Pi'))
     Pi_prev, loss_rate, delta, E_prev = Pi_e.copy(), np.zeros(N), P['d0'].copy(), None
+    u0, Y_prev0 = np.full(N, 0.9), None
     if struct['state'] is not None:
         Pi_prev = Pi_prev0
+        st = struct['state']
+        if 'E_prev' in st:                            # 前の期の量まで与えれば、途中から厳密に続けられる
+            E_prev, loss_rate = _vec(st['E_prev'], N), _vec(st['loss'], N)
+            u0, Y_prev0 = _vec(st['u_prev'], N), _vec(st['Y_prev'], N)
     a = np.ones(N)
     Pop = (0.9 * K / P['v']) / 0.92
     A = np.ones(N) if struct['A0'] is None else _vec(struct['A0'], N)
@@ -183,7 +188,7 @@ def simulate_world(N=2, **kw):
             stress = np.maximum(0.0, -(E - E_prev) / np.maximum(E_prev, 1e-9)) / dt
             delta = P['d0'] * (1 + P['kappa'] * stress)
         E_prev = E
-        u_prev = out['u'][i - 1] if i > 0 else np.full(N, 0.9)
+        u_prev = out['u'][i - 1] if i > 0 else u0
         g_net = P['g0'] + P['g1'] * Pi_prev / K + P['g2'] * (u_prev - 0.85) + P['g_q'] * (E / K - P['q_ref'])
         I_des = K * np.maximum(0.0, P['d0'] + g_net)
         retained = (1 - P['payout']) * Pi_prev + P['d0'] * K
@@ -193,8 +198,8 @@ def simulate_world(N=2, **kw):
         G = P['gG'] * Y_p / P['u_max']
         fu = struct['fiscal_union']
         in_union = fu is not None and fu[0] - dt / 2 <= t < fu[1] - dt / 2
-        if i > 0:
-            Yl = out['Y'][i - 1]
+        if i > 0 or Y_prev0 is not None:
+            Yl = out['Y'][i - 1] if i > 0 else Y_prev0
             ratio = np.full(N, B.sum() / Yl.sum()) if in_union else B / Yl
             tau = np.clip(P['tau'] + P['fiscal'] * (ratio - P['b_target']), 0.0, 0.8)
         else:
@@ -289,6 +294,8 @@ def simulate_world(N=2, **kw):
                             + fx.get('k_u', 0.0) * du) * dt)
         if np.any(P['phillips'] > 0):
             omega = np.clip(omega * (1 + P['phillips'] * (emp - P['e_star']) * dt), 0.3, 0.95)
+    # 最後の期の後の状態(Lean の State と同じ 10 個の量。state に渡せば続きから計算できる)
+    out['next'] = dict(K=K, L=L, B=B, S=S, Pi_e=Pi_e, Pi_prev=Pi_prev, E_prev=E_prev, Y_prev=Y, loss=loss_rate, u_prev=Y / Y_k)
     return out
 
 
