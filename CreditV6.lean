@@ -6,3 +6,4 @@ import CreditV6.TheoremA
 import CreditV6.TheoremB
 import CreditV6.TheoremC
 import CreditV6.Linearization
+import CreditV6.TheoremBModel

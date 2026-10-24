@@ -12,6 +12,7 @@ import CreditV6.Homogeneity
 とくに `x₀` が釣り合い経路の上(`F x₀ = γ·x₀`)にあれば、`J (P x₀) = γ • P x₀`。
 つまり、**成長率 γ はヤコビアンの固有値で、規模の方向がその固有ベクトル**である。
 定理 B の `λ₁` はこの γ にあたり、構成比のずれの減衰率は、残りの固有値と γ の比 `|λ₂|/γ` で決まる。
+この対応を Lean の定理として書いたのが `TheoremBModel.lean` の `model_theoremB` である。
 
 * 抽象的な形(`jacobian_on_ray`): 規模の作用を `x ↦ x + (c − 1) • P x`(`P` は 1 次の量への射影)と書く。
 * 実際のモデル(`step_jacobian_on_ray`): `Model.lean` の `step` を、10 個の量を並べたベクトル空間の写像として見て、
